@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="fomo_purple">#6A1B9A</color>
+    <color name="pure_white">#FFFFFF</color>
 </resources>

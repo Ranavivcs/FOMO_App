@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">FOMO App Project</string>
+    <string name="app_name">FOMO</string>
+    <string name="login">Login</string>
+    <string name="go_to_signup">Go to Sign Up</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
 </resources>

@@ -1,0 +1,108 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF6FF">
+
+    <!-- כותרת -->
+    <TextView
+        android:id="@+id/textViewGroupTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Group Title"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- חברים -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Members:"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="4dp" />
+
+    <LinearLayout
+        android:id="@+id/layoutMembersList"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <!-- טבלת מובילים -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leaderboard:"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="4dp" />
+
+    <LinearLayout
+        android:id="@+id/layoutLeaderboard"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- כפתור חזור -->
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_gravity="start"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Challenges:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewSubCompetitions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/buttonStartChallenge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start New Challenge"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/textViewSubCompetitionsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sub Competitions:"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp" />
+
+    <LinearLayout
+        android:id="@+id/layoutSubCompetitions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/buttonAddSubCompetition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Sub-Competition"
+        android:layout_gravity="end"
+        android:layout_margin="16dp"/>
+
+</LinearLayout>
