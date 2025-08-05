@@ -20,6 +20,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
@@ -31,11 +33,18 @@ class LoginActivity : AppCompatActivity() {
         setupListeners()
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (auth.currentUser != null) {
+            goToMain()
+        }
+    }
+
     private fun initViews() {
         emailEditText = findViewById(R.id.editTextEmail)
         passwordEditText = findViewById(R.id.editTextPassword)
         loginButton = findViewById(R.id.buttonLogin)
-        signupButton = findViewById(R.id.buttonToSignup)
+        signupButton = findViewById(R.id.buttonSignup)
     }
 
     private fun setupListeners() {

@@ -15,8 +15,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 class MyGroupsActivity : AppCompatActivity() {
 
     private lateinit var createGroupLauncher: ActivityResultLauncher<Intent>
+    private lateinit var groupDetailsLauncher: ActivityResultLauncher<Intent>
     private lateinit var recyclerView: RecyclerView
     private lateinit var groupAdapter: GroupAdapter
+
     private val groupList = mutableListOf<Group>()
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -31,13 +33,21 @@ class MyGroupsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_my_groups)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // כפתור חזרה
         findViewById<Button>(R.id.buttonBack).setOnClickListener {
             finish()
         }
 
-        // איתחול ל־ActivityResult שיריץ fetchGroupsForUser כשחוזרים
+        // Create Group Launcher
         createGroupLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                fetchGroupsForUser()
+            }
+        }
+
+        // Group Details Launcher (רענון אחרי מחיקה)
+        groupDetailsLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -51,12 +61,18 @@ class MyGroupsActivity : AppCompatActivity() {
             createGroupLauncher.launch(intent)
         }
 
+        val viewInvitationsButton = findViewById<Button>(R.id.buttonViewInvitations)
+        viewInvitationsButton.setOnClickListener {
+            val intent = Intent(this, InvitationsActivity::class.java)
+            startActivity(intent)
+        }
+
         recyclerView = findViewById(R.id.recyclerViewGroups)
         groupAdapter = GroupAdapter(groupList) { group ->
             val intent = Intent(this, GroupDetailsActivity::class.java)
             intent.putExtra("groupId", group.id)
             intent.putExtra("groupName", group.name)
-            startActivity(intent)
+            groupDetailsLauncher.launch(intent)
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this)

@@ -1,34 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFF6FD">
+    android:background="#F7F8FA"
+    android:padding="24dp">
 
     <TextView
         android:id="@+id/textViewTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="My Groups"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textStyle="bold"
+        android:textColor="#333333"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="24dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewGroups"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="16dp" />
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
+
+    <Button
+        android:id="@+id/buttonViewInvitations"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View Invitations"
+        android:backgroundTint="#E6E6FA"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="16dp"
         android:weightSum="2">
 
         <Button
@@ -36,14 +48,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Back" />
+            android:text="Back"
+            android:backgroundTint="#FFD1DC"
+            android:textColor="#333333"
+            android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/buttonCreateGroup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Create Group" />
+            android:text="Create Group"
+            android:backgroundTint="#FFE4E1"
+            android:textColor="#333333"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
 </LinearLayout>

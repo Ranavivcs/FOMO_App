@@ -33,6 +33,11 @@
         <activity android:name=".MyGroupsActivity" />
         <activity android:name=".GroupDetailsActivity" />
         <activity android:name=".CreateGroupActivity" />
+        <activity android:name=".SubCompetitionDetailsActivity" />
+        <activity android:name=".TrophiesActivity" />
+        <activity android:name=".InvitationsActivity" />
+
+
 
         <!-- Firebase Messaging Service -->
         <service

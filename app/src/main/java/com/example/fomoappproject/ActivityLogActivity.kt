@@ -1,20 +1,25 @@
 package com.example.fomoappproject
 
-import com.google.firebase.Timestamp
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
 
 class ActivityLogActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ActivityAdapter
-    private val activityList = mutableListOf<UserActivity>()
+    private val activityList = mutableListOf<UserActivityWithGroup>()
+    private lateinit var emptyStateTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +31,8 @@ class ActivityLogActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ActivityAdapter(activityList)
         recyclerView.adapter = adapter
+
+        emptyStateTextView = findViewById(R.id.textViewEmptyState)
 
         findViewById<Button>(R.id.buttonBackToMain).setOnClickListener {
             finish()
@@ -40,53 +47,68 @@ class ActivityLogActivity : AppCompatActivity() {
     }
 
     private fun fetchActivitiesFromFirestore() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        if (userId == null) {
-            Toast.makeText(this, "User ID is null", Toast.LENGTH_SHORT).show()
-            println("❌ User ID is null")
-            return
-        }
-
-        println("📤 Fetching activities for userId = $userId")
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         FirebaseFirestore.getInstance()
-            .collection("activities")
+            .collectionGroup("activities")
             .whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { documents ->
-                println("✅ Fetched ${documents.size()} documents")
-                Toast.makeText(this, "Found ${documents.size()} activities", Toast.LENGTH_SHORT).show()
-
                 activityList.clear()
 
-                for (document in documents) {
-                    println("📄 Document: ${document.data}")
-
-                    try {
-                        val raw = document.data
-
-                        val activity = UserActivity(
-                            description = raw["description"] as? String ?: "",
-                            category = raw["category"] as? String ?: "",
-                            timestamp = raw["timestamp"] as? Timestamp ?: Timestamp.now(),
-                            userId = raw["userId"] as? String ?: ""
-                        )
-
-                        println("✅ Built activity manually: $activity")
-                        activityList.add(activity)
-                    } catch (e: Exception) {
-                        println("❌ Still failed manually: ${e.message}")
-                        Toast.makeText(this, "Manual parsing failed", Toast.LENGTH_SHORT).show()
-                    }
+                if (documents.isEmpty) {
+                    emptyStateTextView.visibility = View.VISIBLE
+                    adapter.notifyDataSetChanged()
+                    return@addOnSuccessListener
+                } else {
+                    emptyStateTextView.visibility = View.GONE
                 }
 
-                adapter.notifyDataSetChanged()
+                var pendingFetches = documents.size()
+
+                for (document in documents) {
+                    processActivityDocument(document) {
+                        pendingFetches--
+                        if (pendingFetches == 0) {
+                            // Sort activities by timestamp descending before displaying
+                            activityList.sortByDescending { it.timestamp }
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
+                }
             }
             .addOnFailureListener { e ->
-                println("❌ Firestore error: ${e.message}")
-                Toast.makeText(this, "Firestore failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Failed to load activities", Toast.LENGTH_SHORT).show()
             }
     }
 
+    private fun processActivityDocument(doc: QueryDocumentSnapshot, onComplete: () -> Unit) {
+        val description = doc.getString("description") ?: ""
+        val category = doc.getString("category") ?: "No Category"
+        val timestamp = doc.getTimestamp("timestamp") ?: Timestamp.now()
+
+        val groupId = extractGroupIdFromPath(doc.reference.path)
+        if (groupId == null) {
+            onComplete()
+            return
+        }
+
+        FirebaseFirestore.getInstance()
+            .collection("groups").document(groupId)
+            .get()
+            .addOnSuccessListener { groupDoc ->
+                val groupName = groupDoc.getString("name") ?: "Unknown Group"
+                val activity = UserActivityWithGroup(description, category, timestamp, groupId, groupName)
+                activityList.add(activity)
+            }
+            .addOnCompleteListener { onComplete() }
+    }
+
+    private fun extractGroupIdFromPath(path: String): String? {
+        val parts = path.split("/")
+        val groupIndex = parts.indexOf("groups")
+        return if (groupIndex != -1 && parts.size > groupIndex + 1) {
+            parts[groupIndex + 1]
+        } else null
+    }
 }

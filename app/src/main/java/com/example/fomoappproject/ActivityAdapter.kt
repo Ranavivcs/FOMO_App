@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ActivityAdapter(private val activityList: List<UserActivity>) :
+class ActivityAdapter(private val activityList: List<UserActivityWithGroup>) :
     RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
 
     class ActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.textViewItemTitle)
         val categoryText: TextView = itemView.findViewById(R.id.textViewItemCategory)
+        val groupText: TextView = itemView.findViewById(R.id.textViewItemGroup)
         val dateText: TextView = itemView.findViewById(R.id.textViewItemDate)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityViewHolder {
@@ -25,13 +25,12 @@ class ActivityAdapter(private val activityList: List<UserActivity>) :
         return ActivityViewHolder(view)
     }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
         val activity = activityList[position]
 
-        // הוספנו הגנה מקריסות במקרה של שדות חסרים או ריקים
         holder.titleText.text = activity.description.ifBlank { "No Description" }
         holder.categoryText.text = activity.category.ifBlank { "No Category" }
+        holder.groupText.text = "Group: ${activity.groupName}"
 
         val date = activity.timestamp.toDate()
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
@@ -40,3 +39,5 @@ class ActivityAdapter(private val activityList: List<UserActivity>) :
 
     override fun getItemCount(): Int = activityList.size
 }
+
+

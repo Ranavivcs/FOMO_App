@@ -1,33 +1,69 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
     android:orientation="vertical"
-    android:gravity="center"
-    android:background="#F8F0FF">
+    android:gravity="center_horizontal"
+    android:background="#F7F8FA">
 
-    <EditText
-        android:id="@+id/editTextEmail"
+    <TextView
+        android:id="@+id/textViewSignupTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account ✨"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Email Field -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:layout_marginBottom="12dp" />
+        app:cardElevation="4dp"
+        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="#E6E6FA"
+        android:layout_marginBottom="16dp">
 
-    <EditText
-        android:id="@+id/editTextPassword"
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:textColor="#333333"
+            android:padding="16dp"
+            android:inputType="textEmailAddress"
+            android:background="@android:color/transparent"/>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Password Field -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:layout_marginBottom="24dp" />
+        app:cardElevation="4dp"
+        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="#EAD1DC"
+        android:layout_marginBottom="24dp">
 
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:textColor="#333333"
+            android:padding="16dp"
+            android:inputType="textPassword"
+            android:background="@android:color/transparent"/>
+    </androidx.cardview.widget.CardView>
+
+    <!-- SignUp Button -->
     <Button
         android:id="@+id/buttonSignup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign Up"
-        android:backgroundTint="#6A4AB9"
-        android:textColor="@android:color/white" />
+        android:textColor="#333333"
+        android:backgroundTint="#FFE4E1"/>
+
 </LinearLayout>

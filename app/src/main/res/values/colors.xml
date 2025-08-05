@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="fomo_purple">#6A1B9A</color>
     <color name="pure_white">#FFFFFF</color>
+    <color name="purple_500">#6200EE</color>
+
 </resources>

@@ -37,7 +37,9 @@ class ChooseUsernameActivity : AppCompatActivity() {
             return
         }
 
-        val userId = auth.currentUser?.uid ?: return
+        val currentUser = auth.currentUser
+        val userId = currentUser?.uid ?: return
+        val email = currentUser.email ?: ""
 
         // בדיקה אם השם תפוס
         db.collection("users")
@@ -47,7 +49,7 @@ class ChooseUsernameActivity : AppCompatActivity() {
                 if (!docs.isEmpty) {
                     Toast.makeText(this, "Username already taken", Toast.LENGTH_SHORT).show()
                 } else {
-                    saveUsername(userId, username)
+                    saveUserData(userId, username, email)
                 }
             }
             .addOnFailureListener {
@@ -55,9 +57,14 @@ class ChooseUsernameActivity : AppCompatActivity() {
             }
     }
 
-    private fun saveUsername(userId: String, username: String) {
+    private fun saveUserData(userId: String, username: String, email: String) {
+        val userData = mapOf(
+            "username" to username,
+            "email" to email
+        )
+
         db.collection("users").document(userId)
-            .set(mapOf("username" to username))
+            .set(userData)
             .addOnSuccessListener {
                 Toast.makeText(this, "Username saved", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, MainActivity::class.java))

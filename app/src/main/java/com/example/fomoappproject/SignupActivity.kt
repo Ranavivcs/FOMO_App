@@ -25,6 +25,14 @@ class SignupActivity : AppCompatActivity() {
         setupListeners()
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (auth.currentUser != null) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
+
     private fun initViews() {
         emailEditText = findViewById(R.id.editTextEmail)
         passwordEditText = findViewById(R.id.editTextPassword)

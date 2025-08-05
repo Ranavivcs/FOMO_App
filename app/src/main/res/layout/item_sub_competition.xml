@@ -1,24 +1,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp"
-    android:background="@android:color/white"
-    android:layout_marginBottom="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
 
     <TextView
         android:id="@+id/textViewSubCompetitionName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Challenge Name"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:text="SubCompetition Name"
+        android:textStyle="bold"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/textViewSubCompetitionTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Theme: Sport"
-        android:textSize="14sp"
+        android:text="Theme"
         android:textColor="#555555" />
 </LinearLayout>

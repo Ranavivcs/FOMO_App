@@ -18,6 +18,28 @@
         android:hint="Enter group name"
         android:layout_marginBottom="16dp" />
 
+    <TextView
+        android:id="@+id/textViewStartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Date: "
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/textViewEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="End Date: Not Selected"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/buttonPickEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pick End Date"
+        android:layout_marginTop="8dp"/>
+
+
     <Button
         android:id="@+id/buttonCreateGroup"
         android:layout_width="match_parent"

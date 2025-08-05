@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,10 +7,10 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textViewActivityLogTitle"
+        android:id="@+id/textViewTrophiesTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="My Activities"
+        android:text="My Trophies"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#333333"
@@ -17,33 +18,19 @@
         android:layout_marginBottom="16dp" />
 
     <TextView
-        android:id="@+id/textViewEmptyState"
+        android:id="@+id/textViewEmptyTrophies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No Activities Yet"
+        android:text="No trophies yet 🏆"
         android:textSize="16sp"
         android:textColor="#999999"
-        android:layout_gravity="center"
         android:visibility="gone"
+        android:layout_gravity="center"
         android:layout_marginTop="32dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewActivities"
+        android:id="@+id/recyclerViewTrophies"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp" />
-
-    <Button
-        android:id="@+id/buttonBackToMain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        android:textSize="16sp"
-        android:backgroundTint="#FFD1DC"
-        android:textColor="#333333"
-        android:layout_marginTop="8dp"
-        android:padding="12dp" />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

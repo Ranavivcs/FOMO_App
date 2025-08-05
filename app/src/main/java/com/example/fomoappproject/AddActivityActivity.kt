@@ -9,6 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class AddActivityActivity : AppCompatActivity() {
 
+    private var subCompetitionId: String? = null
+    private var groupId: String? = null
     private lateinit var categorySpinner: Spinner
     private lateinit var descriptionEditText: EditText
     private lateinit var saveButton: Button
@@ -26,6 +28,14 @@ class AddActivityActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_activity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        groupId = intent.getStringExtra("groupId")
+        subCompetitionId = intent.getStringExtra("subCompetitionId")
+
+        if (groupId == null || subCompetitionId == null) {
+            Toast.makeText(this, "Group/SubCompetition ID is missing", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
         // Init views
         categorySpinner = findViewById(R.id.spinnerCategory)
         descriptionEditText = findViewById(R.id.editTextDescription)
@@ -57,14 +67,17 @@ class AddActivityActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val activityData = hashMapOf(
-                "category" to category,
-                "description" to description,
-                "userId" to userId,
-                "timestamp" to Timestamp.now()
-            )
+            val activityData = HashMap<String, Any>()
+            activityData["category"] = category
+            activityData["description"] = description
+            activityData["userId"] = userId
+            activityData["timestamp"] = Timestamp.now()
+            activityData["groupId"] = groupId!!
 
-            db.collection("activities")
+
+            db.collection("groups").document(groupId!!)
+                .collection("subCompetitions").document(subCompetitionId!!)
+                .collection("activities")
                 .add(activityData)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Activity saved", Toast.LENGTH_SHORT).show()
