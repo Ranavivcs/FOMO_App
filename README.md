@@ -27,8 +27,10 @@ Users can join groups, create challenges, log activities, compete on leaderboard
 ---
 
 ## 📸 Screenshots
-_(Add screenshots here to showcase the app’s interface and features)_
-
+![screenshot1](https://github.com/user-attachments/assets/9c074b66-2af1-4606-a9d5-11ef10aadc15)
+![screenshot4](https://github.com/user-attachments/assets/19907042-de1e-47fd-af81-7c509f18d891)
+![screenshot3](https://github.com/user-attachments/assets/ed14a5bf-d9f5-4ada-8c6c-92c4fa7a328f)
+![screenshot2](https://github.com/user-attachments/assets/a3c48a82-28f6-477f-bfc3-928935bc68c9)
 ---
 
 ## 👨‍💻 Development Notes
