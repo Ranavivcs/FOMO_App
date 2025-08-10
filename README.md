@@ -30,7 +30,10 @@ Users can join groups, create challenges, log activities, compete on leaderboard
 ![screenshot4](https://github.com/user-attachments/assets/19907042-de1e-47fd-af81-7c509f18d891)
 ![screenshot3](https://github.com/user-attachments/assets/ed14a5bf-d9f5-4ada-8c6c-92c4fa7a328f)
 ![screenshot2](https://github.com/user-attachments/assets/a3c48a82-28f6-477f-bfc3-928935bc68c9)
+![screenshot6](https://github.com/user-attachments/assets/30ee4b1e-de57-426c-8f4c-2c7280450ae4)
+![screenshot5](https://github.com/user-attachments/assets/1cd565ab-9799-4288-9b7e-83c337832bb6)
 ---
+
 
 ## 👨‍💻 Development Notes
 This project was developed as part of a mobile app development course, with a focus on:
