@@ -11,7 +11,6 @@ Users can join groups, create challenges, log activities, compete on leaderboard
 - 🏆 **Competitions & Sub-Competitions** – With start/end dates, scoring, and winners.
 - 📊 **Leaderboards** – Rank participants based on their logged activities.
 - 🔔 **Push Notifications** – Real-time alerts for new activities, victories, and invitations.
-- 📍 **Location Tracking** – Save and display where each achievement took place on a map.
 - 🎨 **Modern UI** – Clean Material Design interface.
 
 ---
