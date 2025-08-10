@@ -1,148 +1,162 @@
 package com.example.fomoappproject
 
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class InvitationsActivity : AppCompatActivity() {
 
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-    private lateinit var layoutInvites: LinearLayout
+
+    private lateinit var title: TextView
+    private lateinit var listContainer: LinearLayout
+    private lateinit var backBtn: Button
+
+    data class InvitationItem(
+        val groupId: String,
+        val groupName: String,
+        val inviterId: String?,
+        val inviterName: String
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_invitations)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setContentView(R.layout.activity_invitations) //
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        layoutInvites = findViewById(R.id.layoutInvitationsList)
+        title = findViewById(R.id.textViewInvitationsTitle)
+        listContainer = findViewById(R.id.layoutInvitationsList)
+        backBtn = findViewById(R.id.buttonBack)
 
-        findViewById<Button>(R.id.buttonBack).setOnClickListener {
-            finish()
-        }
-
-        fetchPendingInvites()
+        backBtn.setOnClickListener { finish() }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
+    override fun onResume() {
+        super.onResume()
+        loadInvitations()
     }
 
-    private fun fetchPendingInvites() {
-        val userId = auth.currentUser?.uid ?: return
+    private fun loadInvitations() {
+        val uid = auth.currentUser?.uid ?: return
+        listContainer.removeAllViews()
+
 
         db.collection("groups")
-            .whereArrayContains("pendingInvites", userId)
+            .whereArrayContains("pendingInvites", uid)
             .get()
-            .addOnSuccessListener { documents ->
-                layoutInvites.removeAllViews()
-
-                if (documents.isEmpty) {
-                    val emptyText = TextView(this)
-                    emptyText.text = "No pending invitations"
-                    layoutInvites.addView(emptyText)
+            .addOnSuccessListener { snap ->
+                if (snap.isEmpty) {
+                    addEmptyState()
                     return@addOnSuccessListener
                 }
 
-                for (doc in documents) {
-                    val groupName = doc.getString("name") ?: "Unknown Group"
-                    val startDate = doc.getString("startDate") ?: "Unknown"
-                    val endDate = doc.getString("endDate") ?: "Unknown"
-                    val groupId = doc.id
+                // מביא גם את שם המזמין
+                val tasks = snap.documents.map { gDoc ->
+                    val groupId = gDoc.id
+                    val groupName = gDoc.getString("name") ?: "Group"
+                    val inviterId = gDoc.getString("lastInvitedBy")
 
-                    // נביא את ה-username של המזמין (groupOwner)
-                    val groupOwnerId = doc.getString("groupOwner") ?: ""
-
-                    db.collection("users").document(groupOwnerId)
-                        .get()
-                        .addOnSuccessListener { ownerDoc ->
-                            val ownerName = ownerDoc.getString("username") ?: "Unknown"
-
-                            // בונים את ה-layout להזמנה
-                            val inviteLayout = LinearLayout(this)
-                            inviteLayout.orientation = LinearLayout.VERTICAL
-                            inviteLayout.setPadding(0, 0, 0, 32)
-
-                            val groupInfo = TextView(this)
-                            groupInfo.text = "Group: $groupName\nOwner: $ownerName\nStart: $startDate - End: $endDate"
-                            inviteLayout.addView(groupInfo)
-
-                            val acceptButton = Button(this)
-                            acceptButton.text = "Accept"
-                            acceptButton.setOnClickListener { acceptInvite(groupId, userId) }
-                            inviteLayout.addView(acceptButton)
-
-                            val declineButton = Button(this)
-                            declineButton.text = "Decline"
-                            declineButton.setOnClickListener { declineInvite(groupId, userId) }
-                            inviteLayout.addView(declineButton)
-
-                            layoutInvites.addView(inviteLayout)
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(this, "Failed to load inviter's name", Toast.LENGTH_SHORT).show()
-                        }
+                    if (inviterId.isNullOrBlank()) {
+                        Tasks.forResult(
+                            InvitationItem(groupId, groupName, null, "Someone")
+                        )
+                    } else {
+                        db.collection("users").document(inviterId).get()
+                            .continueWith { t ->
+                                val inviterName = t.result?.getString("username") ?: "Someone"
+                                InvitationItem(groupId, groupName, inviterId, inviterName)
+                            }
+                    }
                 }
+
+                Tasks.whenAllSuccess<InvitationItem>(tasks)
+                    .addOnSuccessListener { items ->
+                        if (items.isEmpty()) {
+                            addEmptyState()
+                        } else {
+                            items.forEach { addInvitationRow(it) }
+                        }
+                    }
+                    .addOnFailureListener {
+                        addEmptyState()
+                    }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load invitations", Toast.LENGTH_SHORT).show()
+                addEmptyState()
             }
     }
 
+    private fun addInvitationRow(item: InvitationItem) {
+        val row = LayoutInflater.from(this).inflate(R.layout.item_invitation, listContainer, false)
 
-    private fun acceptInvite(groupId: String, userId: String) {
-        val groupRef = db.collection("groups").document(groupId)
+        val tv = row.findViewById<TextView>(R.id.textViewInvitationUsername)
+        val btnAccept = row.findViewById<Button>(R.id.buttonAcceptInvitation)
+        val btnDecline = row.findViewById<Button>(R.id.buttonDeclineInvitation)
 
-        groupRef.get().addOnSuccessListener { doc ->
-            val members = doc.get("members") as? List<String> ?: emptyList()
+        tv.text = "${item.inviterName} invited you to join \"${item.groupName}\""
 
-            if (userId in members) {
-                // כבר חבר -> רק להסיר מהpendingInvites
-                groupRef.update("pendingInvites", com.google.firebase.firestore.FieldValue.arrayRemove(userId))
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Invitation removed (already a member)", Toast.LENGTH_SHORT).show()
-                        fetchPendingInvites()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Failed to update invitation", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                // להוסיף למembers ולהסיר מpendingInvites
-                db.runBatch { batch ->
-                    batch.update(groupRef, "pendingInvites", com.google.firebase.firestore.FieldValue.arrayRemove(userId))
-                    batch.update(groupRef, "members", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
-                }.addOnSuccessListener {
-                    Toast.makeText(this, "You joined the group!", Toast.LENGTH_SHORT).show()
-                    fetchPendingInvites()
-                }.addOnFailureListener {
-                    Toast.makeText(this, "Failed to accept invitation", Toast.LENGTH_SHORT).show()
-                }
-            }
+        btnAccept.setOnClickListener { accept(item, row) }
+        btnDecline.setOnClickListener { decline(item, row) }
+
+        listContainer.addView(row)
+    }
+
+    private fun accept(item: InvitationItem, rowView: android.view.View) {
+        val uid = auth.currentUser?.uid ?: return
+        val groupRef = db.collection("groups").document(item.groupId)
+
+        db.runBatch { b ->
+            b.update(groupRef, "pendingInvites", FieldValue.arrayRemove(uid))
+            b.update(groupRef, "members", FieldValue.arrayUnion(uid))
+        }.addOnSuccessListener {
+            // נרשום את המשתמש לטופיק של הקבוצה (לפוש)
+            FirebaseMessaging.getInstance()
+                .subscribeToTopic("group_${item.groupId}")
+
+            Toast.makeText(this, "Joined ${item.groupName}", Toast.LENGTH_SHORT).show()
+            listContainer.removeView(rowView)
+            if (listContainer.childCount == 0) addEmptyState()
         }.addOnFailureListener {
-            Toast.makeText(this, "Failed to fetch group", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Failed to accept invitation", Toast.LENGTH_SHORT).show()
         }
     }
 
+    private fun decline(item: InvitationItem, rowView: android.view.View) {
+        val uid = auth.currentUser?.uid ?: return
+        val groupRef = db.collection("groups").document(item.groupId)
 
-    private fun declineInvite(groupId: String, userId: String) {
-        db.collection("groups").document(groupId)
-            .update("pendingInvites", com.google.firebase.firestore.FieldValue.arrayRemove(userId))
+        groupRef.update("pendingInvites", FieldValue.arrayRemove(uid))
             .addOnSuccessListener {
-                Toast.makeText(this, "Invitation declined", Toast.LENGTH_SHORT).show()
-                fetchPendingInvites()
+                Toast.makeText(this, "Declined invitation", Toast.LENGTH_SHORT).show()
+                listContainer.removeView(rowView)
+                if (listContainer.childCount == 0) addEmptyState()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to decline invitation", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to decline", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun addEmptyState() {
+        if (listContainer.childCount > 0) return
+        val tv = TextView(this).apply {
+            text = "No pending invitations"
+            textSize = 16f
+            setTextColor(0xFF666666.toInt())
+            setPadding(8, 8, 8, 8)
+        }
+        listContainer.addView(tv)
     }
 }

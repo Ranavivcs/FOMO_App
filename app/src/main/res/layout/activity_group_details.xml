@@ -76,10 +76,34 @@
                 android:id="@+id/recyclerViewSubCompetitions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
                 android:layout_marginBottom="24dp"/>
+
+            <!-- ===== Finished Challenges (היסטוריה) ===== -->
+            <TextView
+                android:id="@+id/textViewFinishedTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Finished Challenges:"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewFinishedSubCompetitions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:layout_marginBottom="24dp"/>
+            <!-- ========================================= -->
 
         </LinearLayout>
     </ScrollView>
+
+    
 
     <LinearLayout
         android:layout_width="match_parent"

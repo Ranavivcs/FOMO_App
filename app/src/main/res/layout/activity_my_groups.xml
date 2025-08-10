@@ -7,6 +7,7 @@
     android:background="#F7F8FA"
     android:padding="24dp">
 
+    <!-- Title -->
     <TextView
         android:id="@+id/textViewTitle"
         android:layout_width="wrap_content"
@@ -18,14 +19,64 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="24dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewGroups"
+    <!-- Scrollable content: Active + Past groups -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp" />
+        android:fillViewport="true">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Current Groups -->
+            <TextView
+                android:id="@+id/textViewActiveGroupsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Current Groups"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#333333"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewActiveGroups"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+
+            <!-- Past Groups -->
+            <TextView
+                android:id="@+id/textViewPastGroupsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Past Groups"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#333333"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewPastGroups"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- View invitations button -->
     <Button
         android:id="@+id/buttonViewInvitations"
         android:layout_width="match_parent"
@@ -36,6 +87,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"/>
 
+    <!-- Bottom actions -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

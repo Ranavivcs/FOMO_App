@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import android.os.Build
 import android.content.pm.PackageManager
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
 
@@ -67,6 +70,14 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     goToMain()
+
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@addOnSuccessListener
+                        FirebaseFirestore.getInstance().collection("users").document(uid)
+                            .update("fcmTokens", FieldValue.arrayUnion(token))
+                    }
+
+
                 } else {
                     Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }

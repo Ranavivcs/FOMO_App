@@ -20,11 +20,11 @@ class TrophiesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trophies)
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = findViewById(R.id.recyclerViewTrophies)
         emptyStateTextView = findViewById(R.id.textViewEmptyTrophies)
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = TrophyAdapter(trophyList)
         recyclerView.adapter = adapter
@@ -46,21 +46,32 @@ class TrophiesActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { documents ->
                 trophyList.clear()
+
                 for (doc in documents) {
-                    val groupName = doc.getString("groupName") ?: "Unknown Group"
-                    val endDate = doc.getString("endDate") ?: "Unknown Date"
-                    val activityCount = doc.getLong("activityCount")?.toInt() ?: 0
-                    val trophy = Trophy(groupName, endDate, activityCount)
+                    val type = (doc.getString("type") ?: "sub").lowercase()
+                    val wins = (doc.getLong("wins") ?: 0L).toInt()
+                    val activities = (doc.getLong("activityCount") ?: 0L).toInt()
+
+                    val trophy = Trophy(
+                        type = type,
+                        groupId = doc.getString("groupId") ?: "",
+                        groupName = doc.getString("groupName") ?: "Unknown Group",
+                        subCompetitionId = doc.getString("subCompetitionId"),
+                        subName = doc.getString("subName"),
+                        winnerId = doc.getString("winnerId") ?: "",
+                        winnerName = doc.getString("winnerName") ?: "",
+                        endDate = doc.getString("endDate") ?: "Unknown Date",
+                        // לשדה המאוחד באובייקט נכניס wins אם זה גביע קבוצה, אחרת activities
+                        activityCount = if (type == "group") wins else activities
+                    )
                     trophyList.add(trophy)
                 }
+
+                // מיון לפי תאריך סיום יורד (yyyy-MM-dd עובד לקסיקוגרפית)
+                trophyList.sortByDescending { it.endDate }
+
                 adapter.notifyDataSetChanged()
-
-                if (trophyList.isEmpty()) {
-                    emptyStateTextView.visibility = View.VISIBLE
-                } else {
-                    emptyStateTextView.visibility = View.GONE
-                }
-
+                emptyStateTextView.visibility = if (trophyList.isEmpty()) View.VISIBLE else View.GONE
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load trophies", Toast.LENGTH_SHORT).show()

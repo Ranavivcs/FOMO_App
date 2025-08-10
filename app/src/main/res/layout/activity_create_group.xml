@@ -3,46 +3,83 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F7F8FA">
 
+    <!-- כותרת עדינה למסך -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create a Group"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp" />
+
+    <!-- תווית לשם הקבוצה (ללא ID כדי לא לשבור לוגיקה) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Group Name"
-        android:textSize="18sp" />
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="6dp" />
 
     <EditText
         android:id="@+id/editTextGroupName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="Enter group name"
-        android:layout_marginBottom="16dp" />
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:paddingHorizontal="16dp"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        android:backgroundTint="#E6E6FA"
+        android:layout_marginBottom="16dp"
+        android:drawableStart="@android:drawable/ic_menu_edit"
+        android:drawablePadding="8dp" />
 
     <TextView
         android:id="@+id/textViewStartDate"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Date: "
-        android:layout_marginTop="16dp"/>
+        android:text="Start Date:"
+        android:textSize="16sp"
+        android:textColor="#333333"
+        android:layout_marginTop="8dp" />
 
     <TextView
         android:id="@+id/textViewEndDate"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="End Date: Not Selected"
-        android:layout_marginTop="8dp"/>
+        android:textSize="16sp"
+        android:textColor="#333333"
+        android:layout_marginTop="6dp" />
 
     <Button
         android:id="@+id/buttonPickEndDate"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:text="Pick End Date"
-        android:layout_marginTop="8dp"/>
+        android:textAllCaps="false"
+        android:textColor="#333333"
+        android:backgroundTint="#E6E6FA"
+        android:layout_marginTop="10dp" />
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
 
     <Button
         android:id="@+id/buttonCreateGroup"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create Group" />
+        android:layout_height="48dp"
+        android:text="Create Group"
+        android:textAllCaps="false"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        android:backgroundTint="#FFD1DC" />
+
 </LinearLayout>

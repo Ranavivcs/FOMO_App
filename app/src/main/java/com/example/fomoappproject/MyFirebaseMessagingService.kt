@@ -1,5 +1,6 @@
 package com.example.fomoappproject
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -11,69 +12,112 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-
-        val title = remoteMessage.notification?.title ?: "FOMO Notification"
-        val message = remoteMessage.notification?.body ?: "You received a new activity"
-
-        Log.d("FCM", "🔥 Message received: $title - $message")
-
-        showNotification(title, message)
+    companion object {
+        private const val CHANNEL_ID = "fomo_channel"
+        private const val CHANNEL_NAME = "FOMO Notifications"
+        private const val CHANNEL_DESC = "Notifications from the FOMO app"
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("FCM", "📲 New FCM token: $token")
-        // תוכל לשמור את הטוקן במסד אם תרצה בעתיד
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        FirebaseFirestore.getInstance()
+            .collection("users").document(uid)
+            .update("fcmTokens", FieldValue.arrayUnion(token))
+            .addOnFailureListener {
+                // אם אין שדה עדיין – ניצור
+                FirebaseFirestore.getInstance()
+                    .collection("users").document(uid)
+                    .set(mapOf("fcmTokens" to listOf(token)), SetOptions.merge())
+            }
     }
 
-    private fun showNotification(title: String, message: String) {
-        val channelId = "fomo_channel"
-        val notificationId = 1
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        super.onMessageReceived(remoteMessage)
 
+        val title = remoteMessage.notification?.title
+            ?: remoteMessage.data["title"]
+            ?: "FOMO"
+
+        val body = remoteMessage.notification?.body
+            ?: remoteMessage.data["body"]
+            ?: "You have a new notification"
+
+        // העבר גם את ה-data
+        showNotification(title, body, remoteMessage.data)
+    }
+
+    // חתימה חדשה עם data
+    private fun showNotification(title: String, message: String, data: Map<String, String>) {
+        // === יצירת ערוץ כמו שכבר יש לך ===
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "FOMO Notifications"
-            val descriptionText = "Notifications from the FOMO app"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            val mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val ch = NotificationChannel(
+                CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT
+            ).apply { description = CHANNEL_DESC }
+            mgr.createNotificationChannel(ch)
         }
 
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        // אם הגיעו מזהים – נפתח את מסך התת־תחרות; אחרת את ה-Main
+        val intent = if (data["groupId"] != null && data["subCompetitionId"] != null) {
+            Intent(this, SubCompetitionDetailsActivity::class.java).apply {
+                putExtra("groupId", data["groupId"])
+                putExtra("subCompetitionId", data["subCompetitionId"])
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+        } else {
+            Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // שים פה אייקון קיים בפרויקט
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_stat_fomo)
             .setContentTitle(title)
             .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-
-        // בדיקת הרשאה לפני קריאת notify
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            with(NotificationManagerCompat.from(this)) {
-                notify(notificationId, builder.build())
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .apply {
+                try {
+                    setColor(ContextCompat.getColor(this@MyFirebaseMessagingService, R.color.fomo_purple))
+                } catch (_: Exception) {}
             }
+
+        val canNotify = Build.VERSION.SDK_INT < 33 ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+
+        if (canNotify) {
+            NotificationManagerCompat.from(this)
+                .notify(System.currentTimeMillis().toInt(), builder.build())
         } else {
-            Log.w("FCM", "🚫 No permission to post notifications.")
+            Log.w("FCM", "No POST_NOTIFICATIONS permission, skipping notify()")
         }
+    }
+
+    // -------- Optional: שמירת טוקן למשתמש המחובר --------
+    private fun saveTokenForCurrentUser(token: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users").document(uid)
+            .update("fcmTokens", FieldValue.arrayUnion(token))
+            .addOnSuccessListener { Log.d("FCM", "Token saved for user $uid") }
+            .addOnFailureListener { e -> Log.w("FCM", "Failed to save token: ${e.message}") }
     }
 }

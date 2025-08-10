@@ -1,47 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@drawable/dialog_background">
 
+    <!-- Title -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Challenge"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="#333333"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="20dp"/>
 
+    <!-- Challenge name -->
     <EditText
         android:id="@+id/editTextChallengeName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="Challenge Name"
-        android:padding="12dp"
-        android:background="@android:drawable/edit_text"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textColor="#333333"
+        android:textColorHint="#888888"
         android:layout_marginBottom="12dp"/>
 
+    <!-- Theme selector -->
     <Spinner
         android:id="@+id/spinnerThemes"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Start date button -->
     <Button
         android:id="@+id/buttonStartDate"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="Choose Start Date"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:backgroundTint="#FFD1DC"
         android:layout_marginBottom="8dp"/>
 
+    <!-- End date button -->
     <Button
         android:id="@+id/buttonEndDate"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="Choose End Date"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:backgroundTint="#FFD1DC"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Action buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,17 +70,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            android:textColor="@color/purple_500"
-            android:padding="8dp"/>
+            android:textColor="#666666"
+            android:padding="8dp"
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/textViewCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create"
-            android:textColor="@color/purple_500"
+            android:textColor="#9C27B0"
             android:textStyle="bold"
-            android:padding="8dp"/>
+            android:padding="8dp"
+            android:textSize="16sp"/>
     </LinearLayout>
 
 </LinearLayout>

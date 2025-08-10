@@ -1,14 +1,20 @@
 package com.example.fomoappproject
 
+import android.content.ClipData
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
+import android.content.ClipboardManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var welcomeTextView: TextView
     private lateinit var activitiesCountTextView: TextView
-    private lateinit var groupsCountTextView: TextView
+    private var groupsCountTextView: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         welcomeTextView = findViewById(R.id.textViewWelcome)
         activitiesCountTextView = findViewById(R.id.textViewActivitiesCount)
-        groupsCountTextView = findViewById(R.id.textViewGroupsCount)
+
 
         findViewById<CardView>(R.id.cardMyActivities).setOnClickListener {
             startActivity(Intent(this, ActivityLogActivity::class.java))
@@ -57,15 +63,26 @@ class MainActivity : AppCompatActivity() {
     private fun saveFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
+                Log.w("FCM", "❌ Failed to get FCM token", task.exception)
                 return@addOnCompleteListener
             }
 
-            val token = task.result
-            val userId = auth.currentUser?.uid
+            val token = task.result ?: return@addOnCompleteListener
+            Log.d("FCM", "✅ FCM token: $token")
 
-            if (userId != null && token != null) {
+            // מעתיקים קליפבורד לנוחות
+            val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            cm.setPrimaryClip(ClipData.newPlainText("FCM Token", token))
+            Toast.makeText(this, "FCM token copied to clipboard", Toast.LENGTH_SHORT).show()
+
+            // שומרים גם ב-Firestore תחת המשתמש
+            val userId = auth.currentUser?.uid
+            if (userId != null) {
                 db.collection("users").document(userId)
-                    .update("fcmToken", token)
+                    .set(mapOf("fcmToken" to token), SetOptions.merge())
+                    .addOnFailureListener { e ->
+                        Log.w("FCM", "Couldn't save token to Firestore: ${e.message}")
+                    }
             }
         }
     }
@@ -99,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { documents ->
                 val count = documents.size()
-                groupsCountTextView.text = "Groups: $count"
+                groupsCountTextView?.text = "Groups: $count"
             }
     }
 

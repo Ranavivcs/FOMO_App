@@ -4,20 +4,42 @@
     android:padding="24dp"
     android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F7F8FA">
+
+    <!-- כותרת עדינה (ללא ID כדי לא להפריע ללוגיקה) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pick a username"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp" />
 
     <EditText
         android:id="@+id/editTextUsername"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="Choose a username"
-        android:minHeight="48dp"
-        android:textColor="@android:color/black"/>
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:paddingHorizontal="16dp"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        android:backgroundTint="#E6E6FA"
+        android:layout_marginBottom="16dp"
+        android:drawableStart="@android:drawable/ic_menu_edit"
+        android:drawablePadding="8dp" />
 
     <Button
         android:id="@+id/buttonContinue"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="Continue"
-        android:layout_marginTop="16dp"/>
+        android:textAllCaps="false"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        android:backgroundTint="#FFD1DC"
+        android:stateListAnimator="@null" />
 </LinearLayout>
